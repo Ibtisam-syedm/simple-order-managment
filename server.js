@@ -4,6 +4,8 @@ const app = express();
 const port = process.env.PORT;
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
+const categoryRoutes = require('./routes/category');
+const itemRoutes = require('./routes/item');
 
 uri = ""
 if (process.env.NODE_ENV === 'production') {
@@ -39,6 +41,8 @@ const Order = mongoose.model('Order', orderSchema);
 
 
 app.use(bodyParser.json());
+app.use('/api/categories', categoryRoutes);
+app.use('/api/items', itemRoutes);
 // Define routes and middleware here
 
 // Error handling middleware
