@@ -14,13 +14,13 @@ router.use((err, req, res, next) => {
     }
   });
 
-router.put('/:orderId/complete', async (req, res, next) => {
+  router.put('/:orderId/complete', async (req, res, next) => {
     const orderId = req.params.orderId;
   
     try {
       const order = await Order.findByIdAndUpdate(
         orderId,
-        { completed: true },
+        { completed: true, completedAt: Date.now() },
         { new: true }
       ).exec();
   
@@ -28,93 +28,78 @@ router.put('/:orderId/complete', async (req, res, next) => {
         return next(new Error('Order not found'));
       }
   
-      res.status(200).json(order);
+      res.status(200).json(order.toObject()); // Include virtuals in response
     } catch (err) {
       console.error(err);
       next(new Error('Failed to complete order'));
     }
-  });
+});
+
   
   
-  
-  router.post('/', async (req, res, next) => {
-    try {
-        const { userId, items } = req.body;
-        
-        // Create a new order
-        const order = new Order({
+router.post('/', async (req, res, next) => {
+  try {
+      const { userId, items } = req.body;
+      
+      // Create a new order
+      const order = new Order({
           userId,
           items,
-          completed: false
-        });
-    
-        // Save the order in the database
-        await order.save();
-    
-        // Send the order data as a response
-        res.json(order);
-      } catch(err) {
-        // Send error message if something goes wrong
-        res.status(500).send(err.message);
-      }
-    // const { userId, productId, quantity } = req.body;
+          completed: false,
+          placedAt: Date.now()
+      });
   
-    // if (!userId || !productId || !quantity) {
-    //   const error = new Error('Missing required fields');
-    //   error.status = 400;
-    //   return next(error);
-    // }
+      // Save the order in the database
+      await order.save();
   
-    // try {
-    //   const order = new Order({
-    //     userId,
-    //     productId,
-    //     quantity,
-    //   });
-  
-    //   const savedOrder = await order.save();
-    //   res.status(201).json(savedOrder);
-    // } catch (err) {
-    //   console.error(err);
-    //   next(new Error('Failed to save order'));
-    // }
-  });
-  
-  
+      // Send the order data as a response
+      res.json(order.toObject()); // Include virtuals in response
+  } catch(err) {
+      // Send error message if something goes wrong
+      res.status(500).send(err.message);
+  }
+});
+
   router.get('/completed', (req, res, next) => {
     Order.find({ completed: true })
       .exec()
       .then((completedOrders) => {
-        res.status(200).json(completedOrders);
+        const ordersWithTotalTime = completedOrders.map(order => order.toObject());
+        res.status(200).json(ordersWithTotalTime);
       })
       .catch((err) => {
         console.error(err);
         next(new Error('Failed to fetch completed orders'));
       });
-  });
-  
+});
+
+
   router.get('/uncompleted', (req, res, next) => {
     Order.find({ completed: false })
       .exec()
       .then((uncompletedOrders) => {
-        res.status(200).json(uncompletedOrders);
+        const ordersWithTimePassed = uncompletedOrders.map(order => order.toObject());
+        res.status(200).json(ordersWithTimePassed);
       })
       .catch((err) => {
         console.error(err);
         next(new Error('Failed to fetch uncompleted orders'));
       });
-  });
+});
+
   
-  router.get('/', (req, res, next) => {
-    Order.find({})
-      .exec()
-      .then((orders) => {
-        res.status(200).json(orders);
-      })
-      .catch((err) => {
-        console.error(err);
-        next(new Error('Failed to fetch orders'));
-      });
-  });
+router.get('/', (req, res, next) => {
+  Order.find({})
+    .exec()
+    .then((orders) => {
+      const ordersWithVirtuals = orders.map(order => order.toObject());
+      res.status(200).json(ordersWithVirtuals);
+    })
+    .catch((err) => {
+      console.error(err);
+      next(new Error('Failed to fetch orders'));
+    });
+});
+
 
   module.exports = router;
