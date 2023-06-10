@@ -4,7 +4,23 @@ const router = express.Router();
 const kitchenqueue = require("../models/kitchenqueue")
 // Create a basic schema
 
+// complete an item
+router.put('/completeItem/:id', async (req, res) => {
+  const collectionName = req.body.name;
+  const Item = mongoose.model(collectionName, kitchenqueue, collectionName);
+  try {
+    const updatedItem = await Item.findByIdAndUpdate(
+      req.params.id,
+      { completed: true, completedAt: Date.now() },
+      { new: true }
+    ).exec();
 
+    res.status(200).json(updatedItem.toObject()); // Include virtuals in response
+  } catch (err) {
+    console.error(err);
+    res.status(400).json("errors"); // Include virtuals in response
+  }
+});
 // Express.js route handling
 router.post('/create-collection/:name', async (req, res) => {
   // The collection name is passed as a dynamic segment in the URL
