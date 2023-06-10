@@ -6,7 +6,8 @@ const bodyParser = require("body-parser");
 const categoryRoutes = require('./routes/category');
 const itemRoutes = require('./routes/item');
 const orderRoutes = require('./routes/order')
-const connectToDatabase = require('./db');
+const kitchenqueueRoutes = require('./routes/kitchenqueues')
+const connectToDatabase = require('./utils/db');
 
 uri = ""
 if (process.env.NODE_ENV === 'production') {
@@ -22,13 +23,13 @@ if (process.env.NODE_ENV === 'production') {
 // Connect to the database
 connectToDatabase(uri);
 
-
-
 app.use(bodyParser.json());
 app.use('/api/categories', categoryRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/orders',orderRoutes);
+app.use('/api/kitchenqueues',kitchenqueueRoutes);
 // Define routes and middleware here
+
 
 
 // Start the server

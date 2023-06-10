@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
 
 // PUT to update an item
 router.put('/:id', async (req, res) => {
-  const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body);
+  const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body,{new: true});
   res.json(updatedItem);
 });
 

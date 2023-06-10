@@ -38,6 +38,9 @@ router.use((err, req, res, next) => {
   
   
 router.post('/', async (req, res, next) => {
+  // const { userId, items } = req.body;
+  // console.log(items);
+  // res.json({"message":"testing"})
   try {
       const { userId, items } = req.body;
       
@@ -50,8 +53,20 @@ router.post('/', async (req, res, next) => {
       });
   
       // Save the order in the database
-      await order.save();
-  
+      // await order.save();
+      ////////////////////////////////////
+      for(i=0;i<items.lenght;i++){
+        console.log(items[i]);
+      }
+      // const toSave = mongoose.model(categoryName, kitchenqueue);
+      // //create object 
+      // const foodItem = new toSave({
+      //   itemName: itemName,
+      //   orderId: order._id,
+      // });
+      // //save
+      // const savedFoodItem = await foodItem.save();
+      ////////////////////////////////////
       // Send the order data as a response
       res.json(order.toObject()); // Include virtuals in response
   } catch(err) {
